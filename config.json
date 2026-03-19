@@ -1,0 +1,111 @@
+{
+  "apiKey": "",
+  "model": "claude-sonnet-4-20250514",
+  "port": 3002,
+  "cafes": [
+    {
+      "id": "poron",
+      "name": "全宇宙魔法使いぱぴぷぺポロン",
+      "nameEn": "Papipupeporon - Space Witch Concept Cafe",
+      "address": "〒105-0004 東京都港区新橋3-22-7 新橋Nビル",
+      "addressEn": "Shinbashi N Building, 3-22-7 Shinbashi, Minato-ku, Tokyo",
+      "hours": "18:00 - 05:00",
+      "concept": "魔法使いコンセプトカフェ",
+      "conceptEn": "Space Witch Concept Cafe",
+      "rules": [
+        "1ドリンクオーダー制",
+        "撮影はキャストに確認してください",
+        "チェキ撮影あり"
+      ],
+      "rulesEn": [
+        "Minimum 1 drink order per person",
+        "Please ask staff before taking photos",
+        "Cheki (instant photo) available with cast members"
+      ],
+      "menu": {
+        "drinks": "ソフトドリンク ¥500〜 / アルコール ¥700〜",
+        "food": "軽食あり",
+        "cheki": "チェキ ¥1,000〜"
+      },
+      "wifi": "お店のスタッフにお尋ねください",
+      "payment": [
+        "現金",
+        "クレジットカード"
+      ],
+      "nearestStation": "新橋駅 徒歩5分"
+    },
+    {
+      "id": "metavania",
+      "name": "池袋コンカフェめたばにあ",
+      "nameEn": "Metavania - Ikebukuro Concept Cafe",
+      "address": "〒170-0013 東京都豊島区東池袋1-12-15",
+      "addressEn": "1-12-15 Higashi-Ikebukuro, Toshima-ku, Tokyo",
+      "hours": "18:00 - 05:00",
+      "concept": "コンセプトカフェ",
+      "conceptEn": "Concept Cafe",
+      "rules": [
+        "1ドリンクオーダー制",
+        "撮影はキャストに確認してください",
+        "チェキ撮影あり"
+      ],
+      "rulesEn": [
+        "Minimum 1 drink order per person",
+        "Please ask staff before taking photos",
+        "Cheki (instant photo) available with cast members"
+      ],
+      "menu": {
+        "drinks": "ソフトドリンク ¥500〜 / アルコール ¥700〜",
+        "food": "軽食あり",
+        "cheki": "チェキ ¥1,000〜"
+      },
+      "wifi": "お店のスタッフにお尋ねください",
+      "payment": [
+        "現金",
+        "クレジットカード"
+      ],
+      "nearestStation": "池袋駅 徒歩5分"
+    },
+    {
+      "id": "punpuri",
+      "name": "けもみみコンカフェ ぷんぷりぷいっこ",
+      "nameEn": "Punpuripuikko - Animal Ears Concept Cafe",
+      "address": "〒170-0013 東京都豊島区東池袋1-39-2",
+      "addressEn": "1-39-2 Higashi-Ikebukuro, Toshima-ku, Tokyo",
+      "hours": "18:00 - 05:00",
+      "concept": "けもみみ（動物耳）コンセプトカフェ",
+      "conceptEn": "Animal Ears Concept Cafe",
+      "rules": [
+        "1ドリンクオーダー制",
+        "撮影はキャストに確認してください",
+        "チェキ撮影あり"
+      ],
+      "rulesEn": [
+        "Minimum 1 drink order per person",
+        "Please ask staff before taking photos",
+        "Cheki (instant photo) available with cast members"
+      ],
+      "menu": {
+        "drinks": "ソフトドリンク ¥500〜 / アルコール ¥700〜",
+        "food": "軽食あり",
+        "cheki": "チェキ ¥1,000〜"
+      },
+      "wifi": "お店のスタッフにお尋ねください",
+      "payment": [
+        "現金",
+        "クレジットカード"
+      ],
+      "nearestStation": "池袋駅 徒歩5分"
+    }
+  ],
+  "defaultCafe": "poron",
+  "ttsProvider": "elevenlabs",
+  "elevenlabs": {
+    "apiKey": "",
+    "voiceId": "f4u1srhP3Uu6bFYmGyXZ",
+    "model": "eleven_multilingual_v2",
+    "stability": 0.45,
+    "similarityBoost": 0.9,
+    "style": 0.65,
+    "speakerBoost": true
+  }
+}

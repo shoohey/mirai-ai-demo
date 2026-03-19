@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Mirai - Concept Cafe AI</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Mode Selection Screen -->
+  <div id="mode-screen" class="screen active">
+    <div class="lang-header">
+      <div class="lang-title">Mirai AI</div>
+      <div class="lang-subtitle">モードを選択してください</div>
+    </div>
+    <div class="lang-grid" style="max-width:400px;">
+      <button class="lang-btn mode-btn" id="mode-customer" style="border-color:rgba(255,105,180,0.4);">
+        <span class="flag">💬</span> 接客モード
+      </button>
+      <button class="lang-btn mode-btn" id="mode-training" style="border-color:rgba(124,58,237,0.4);">
+        <span class="flag">📚</span> 教育モード
+      </button>
+    </div>
+    <a href="/patterns.html" style="position:fixed;bottom:20px;right:10px;font-size:11px;color:#555;text-decoration:none;">返答パターン管理</a>
+    <a href="/voice-setup.html" style="position:fixed;bottom:5px;right:10px;font-size:11px;color:#555;text-decoration:none;">Voice & Avatar Setup</a>
+    <div id="debug-info" style="position:fixed;bottom:5px;left:5px;font-size:10px;color:#555;"></div>
+  </div>
+
+  <!-- Language Selection Screen -->
+  <div id="language-screen" class="screen">
+    <div class="lang-header">
+      <div class="lang-title">Welcome to our Cafe!</div>
+      <div class="lang-subtitle">Choose your language</div>
+    </div>
+    <div id="cafe-select"></div>
+    <div class="lang-grid">
+      <button class="lang-btn" data-lang="ja"><span class="flag">🇯🇵</span> 日本語</button>
+      <button class="lang-btn" data-lang="en"><span class="flag">🇬🇧</span> English</button>
+      <button class="lang-btn" data-lang="zh"><span class="flag">🇨🇳</span> 中文</button>
+      <button class="lang-btn" data-lang="ko"><span class="flag">🇰🇷</span> 한국어</button>
+      <button class="lang-btn" data-lang="fr"><span class="flag">🇫🇷</span> Français</button>
+      <button class="lang-btn" data-lang="es"><span class="flag">🇪🇸</span> Español</button>
+      <button class="lang-btn" data-lang="th"><span class="flag">🇹🇭</span> ไทย</button>
+    </div>
+  </div>
+
+  <!-- Training Mode Screen -->
+  <div id="training-screen" class="screen">
+    <div class="top-bar">
+      <div class="top-bar-title" style="background:linear-gradient(135deg,#7C3AED,#FF69B4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">📚 教育モード</div>
+      <div class="top-bar-btns">
+        <button class="icon-btn" id="training-sound-toggle" aria-label="Sound on">🔊</button>
+        <button class="icon-btn" id="training-back-btn" aria-label="Back">↩</button>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="character-area">
+        <div id="training-character-container"></div>
+        <div id="training-speech-bubble" class="speech-bubble">
+          <div id="training-speech-text"></div>
+        </div>
+      </div>
+      <div class="chat-area">
+        <div id="training-messages"></div>
+        <div class="quick-section">
+          <div id="training-quick-buttons"></div>
+        </div>
+        <div class="chat-input-area">
+          <form id="training-form" autocomplete="off">
+            <button type="button" class="mic-btn icon-btn" id="training-mic-btn" aria-label="Voice input">🎤</button>
+            <input type="text" id="training-input" placeholder="ミライちゃんに教えたいことを話してください..." enterkeyhint="send">
+            <button type="submit" class="send-btn" aria-label="Send">➤</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Chat Screen -->
+  <div id="main-screen" class="screen">
+    <div class="top-bar">
+      <div class="top-bar-title">Mirai AI Concierge</div>
+      <div class="top-bar-btns">
+        <button class="icon-btn" id="sound-toggle" aria-label="Sound on">🔊</button>
+        <button class="icon-btn" id="back-btn" aria-label="Back">↩</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- Character + Speech Bubble Area -->
+      <div class="character-area">
+        <div id="character-container"></div>
+        <div id="speech-bubble" class="speech-bubble">
+          <div id="speech-text"></div>
+        </div>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="chat-area">
+        <div id="chat-messages"></div>
+
+        <div class="quick-section">
+          <div id="quick-buttons"></div>
+        </div>
+
+        <div class="chat-input-area">
+          <form id="chat-form" autocomplete="off">
+            <button type="button" class="mic-btn icon-btn" id="mic-btn" aria-label="Voice input">🎤</button>
+            <input type="text" id="chat-input" placeholder="Type a message..." enterkeyhint="send">
+            <button type="submit" class="send-btn" aria-label="Send">➤</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live2D Cubism Core + pixi.js v6 + pixi-live2d-display -->
+  <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"></script>
+
+  <script src="/js/unity-bridge.js"></script>
+  <script src="/js/canvas-character.js"></script>
+  <script src="/js/live2d-character.js"></script>
+  <script src="/js/character.js"></script>
+  <script src="/js/speech.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

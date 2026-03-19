@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ミライちゃん 返答パターン管理</title>
+  <style>
+    :root {
+      --pink: #FF69B4;
+      --pink-dark: #DB2777;
+      --purple: #7C3AED;
+      --bg: #0F0B1E;
+      --bg-card: #1A1333;
+      --text: #F0E6FF;
+      --text-muted: #A09CB5;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      font-size: 28px;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p { color: var(--text-muted); margin-top: 8px; font-size: 14px; }
+    .header a {
+      color: var(--pink);
+      text-decoration: none;
+      font-size: 13px;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .add-form {
+      max-width: 700px;
+      margin: 0 auto 30px;
+      background: var(--bg-card);
+      border: 1px solid rgba(255,105,180,0.2);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .add-form h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: var(--pink);
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,105,180,0.3);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { border-color: var(--pink); }
+
+    .btn {
+      padding: 10px 24px;
+      border-radius: 10px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: white;
+    }
+    .btn-primary:hover { transform: scale(1.03); }
+    .btn-danger {
+      background: rgba(255,50,50,0.2);
+      color: #ff9999;
+      border: 1px solid rgba(255,50,50,0.3);
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+    .btn-danger:hover { background: rgba(255,50,50,0.4); }
+
+    .pattern-list {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .pattern-list h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: var(--pink);
+    }
+    .pattern-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,105,180,0.15);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .pattern-card .category-tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(124,58,237,0.2);
+      color: #B794F6;
+      margin-bottom: 8px;
+    }
+    .pattern-card .keyword {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--pink);
+      margin-bottom: 6px;
+    }
+    .pattern-card .response {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .pattern-card .actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .empty-msg {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px;
+      font-size: 15px;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--pink-dark);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: transform 0.3s ease;
+      z-index: 999;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>ミライちゃん 返答パターン管理</h1>
+    <p>キーワードに対する返答パターンを登録すると、ミライちゃんがそのパターンに沿って返事します</p>
+    <a href="/">< チャット画面に戻る</a>
+  </div>
+
+  <div class="add-form">
+    <h2>+ 新しいパターンを追加</h2>
+    <div class="form-group">
+      <label>カテゴリ</label>
+      <select id="form-category">
+        <option value="greeting">あいさつ</option>
+        <option value="menu">メニュー</option>
+        <option value="system">システム・ルール</option>
+        <option value="cheki">チェキ</option>
+        <option value="event">イベント</option>
+        <option value="cast">キャスト</option>
+        <option value="other">その他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>キーワード（お客様がこう聞いたら）</label>
+      <input type="text" id="form-keyword" placeholder="例: おすすめドリンク、トイレ、予約">
+    </div>
+    <div class="form-group">
+      <label>ミライちゃんの返答</label>
+      <textarea id="form-response" placeholder="例: おすすめは魔法のフルーツカクテルですにゃ~！見た目もキラキラで可愛いんですよ！"></textarea>
+    </div>
+    <button class="btn btn-primary" id="add-btn">追加する</button>
+  </div>
+
+  <div class="pattern-list">
+    <h2>登録済みパターン (<span id="pattern-count">0</span>件)</h2>
+    <div id="patterns-container"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var patterns = [];
+
+    function loadPatterns() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/patterns', true);
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          patterns = JSON.parse(xhr.responseText);
+          renderPatterns();
+        }
+      };
+      xhr.send();
+    }
+
+    function renderPatterns() {
+      var container = document.getElementById('patterns-container');
+      var countEl = document.getElementById('pattern-count');
+      countEl.textContent = patterns.length;
+
+      if (patterns.length === 0) {
+        container.innerHTML = '<div class="empty-msg">まだパターンが登録されていません</div>';
+        return;
+      }
+
+      var categoryNames = {
+        greeting: 'あいさつ', menu: 'メニュー', system: 'システム・ルール',
+        cheki: 'チェキ', event: 'イベント', cast: 'キャスト', other: 'その他'
+      };
+
+      var html = '';
+      for (var i = 0; i < patterns.length; i++) {
+        var p = patterns[i];
+        var catName = categoryNames[p.category] || p.category;
+        html += '<div class="pattern-card">'
+          + '<span class="category-tag">' + escapeHtml(catName) + '</span>'
+          + '<div class="keyword">' + escapeHtml(p.keyword) + '</div>'
+          + '<div class="response">' + escapeHtml(p.response) + '</div>'
+          + '<div class="actions">'
+          + '<button class="btn btn-danger" onclick="deletePattern(' + i + ')">削除</button>'
+          + '</div></div>';
+      }
+      container.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showToast(msg) {
+      var toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2500);
+    }
+
+    document.getElementById('add-btn').addEventListener('click', function() {
+      var category = document.getElementById('form-category').value;
+      var keyword = document.getElementById('form-keyword').value.trim();
+      var response = document.getElementById('form-response').value.trim();
+
+      if (!keyword || !response) {
+        showToast('キーワードと返答を入力してください');
+        return;
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/patterns', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          document.getElementById('form-keyword').value = '';
+          document.getElementById('form-response').value = '';
+          showToast('パターンを追加しました！');
+          loadPatterns();
+        } else {
+          showToast('エラーが発生しました');
+        }
+      };
+      xhr.send(JSON.stringify({ category: category, keyword: keyword, response: response }));
+    });
+
+    window.deletePattern = function(index) {
+      if (!confirm('このパターンを削除しますか？')) return;
+      var xhr = new XMLHttpRequest();
+      xhr.open('DELETE', '/api/patterns/' + index, true);
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          showToast('削除しました');
+          loadPatterns();
+        }
+      };
+      xhr.send();
+    };
+
+    loadPatterns();
+  </script>
+</body>
+</html>

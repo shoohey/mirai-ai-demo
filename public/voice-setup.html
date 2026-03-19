@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Setup - Maid Cafe AI</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #0a0a1a;
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container { max-width: 900px; margin: 0 auto; }
+h1 {
+  text-align: center;
+  background: linear-gradient(135deg, #ff6b9d, #c44dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+.subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 14px; }
+.card {
+  background: #151528;
+  border: 1px solid #2a2a4a;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.card h2 {
+  color: #ff6b9d;
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+.status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-left: 10px;
+}
+.status-ok { background: #1a3a2a; color: #4caf50; }
+.status-ng { background: #3a1a1a; color: #f44336; }
+
+/* API Key */
+.api-key-form { display: flex; gap: 10px; }
+.api-key-form input {
+  flex: 1;
+  background: #0a0a1a;
+  border: 1px solid #3a3a5a;
+  color: #e0e0e0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.api-key-form input:focus { outline: none; border-color: #ff6b9d; }
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #ff6b9d, #c44dff);
+  color: white;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary {
+  background: #2a2a4a;
+  color: #e0e0e0;
+}
+.btn-secondary:hover { background: #3a3a5a; }
+.btn-small { padding: 6px 14px; font-size: 12px; }
+.btn-success {
+  background: #2e7d32;
+  color: white;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Voice list */
+.voice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.voice-item {
+  background: #0a0a1a;
+  border: 2px solid #2a2a4a;
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.voice-item:hover { border-color: #ff6b9d; }
+.voice-item.active { border-color: #c44dff; background: #1a1a3a; }
+.voice-item .name { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+.voice-item .category { color: #888; font-size: 12px; }
+.voice-item .labels { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.voice-item .label {
+  background: #2a2a4a;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: #aaa;
+}
+.voice-item .actions { margin-top: 10px; display: flex; gap: 6px; }
+
+/* Settings */
+.setting-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+  gap: 14px;
+}
+.setting-row label {
+  width: 160px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.setting-row input[type="range"] {
+  flex: 1;
+  accent-color: #ff6b9d;
+}
+.setting-row .value {
+  width: 50px;
+  text-align: right;
+  color: #ff6b9d;
+  font-weight: bold;
+}
+.setting-desc { font-size: 11px; color: #666; margin-top: -8px; margin-bottom: 14px; margin-left: 174px; }
+
+/* Language preview */
+.lang-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.lang-btn {
+  padding: 6px 16px;
+  background: #2a2a4a;
+  border: 1px solid #3a3a5a;
+  color: #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.lang-btn:hover { border-color: #ff6b9d; }
+.lang-btn.active { background: #ff6b9d33; border-color: #ff6b9d; color: #ff6b9d; }
+
+/* Clone section */
+.upload-area {
+  border: 2px dashed #3a3a5a;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.upload-area:hover { border-color: #ff6b9d; background: #1a1a2a; }
+.upload-area.dragover { border-color: #c44dff; background: #1a1a3a; }
+.file-list { margin: 12px 0; }
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #0a0a1a;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.file-item .remove { color: #f44336; cursor: pointer; }
+
+.clone-name {
+  background: #0a0a1a;
+  border: 1px solid #3a3a5a;
+  color: #e0e0e0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.clone-name:focus { outline: none; border-color: #ff6b9d; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  z-index: 1000;
+  animation: fadeIn 0.3s;
+}
+.toast-success { background: #2e7d32; }
+.toast-error { background: #c62828; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+/* VRoid promo */
+.vroid-section {
+  background: linear-gradient(135deg, #1a1a3a, #2a1a3a);
+  border: 1px solid #4a3a6a;
+}
+.vroid-steps {
+  counter-reset: step;
+  list-style: none;
+  padding: 0;
+}
+.vroid-steps li {
+  counter-increment: step;
+  padding: 10px 0 10px 40px;
+  position: relative;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.vroid-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b9d, #c44dff);
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vroid-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: #c44dff;
+  text-decoration: none;
+  font-weight: bold;
+}
+.vroid-link:hover { text-decoration: underline; }
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 30px;
+  color: #888;
+  text-decoration: none;
+}
+.back-link:hover { color: #ff6b9d; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Voice & Avatar Setup</h1>
+  <p class="subtitle">アニメ声の設定 & 3Dアバター管理</p>
+
+  <!-- API Key -->
+  <div class="card">
+    <h2>ElevenLabs API Key <span id="apiStatus" class="status"></span></h2>
+    <div class="api-key-form">
+      <input type="password" id="apiKeyInput" placeholder="sk_xxxxxxxxxxxxxxxxxxxxxxxx">
+      <button class="btn btn-primary" onclick="saveApiKey()">Save & Connect</button>
+    </div>
+    <p style="margin-top:8px;font-size:12px;color:#666">
+      <a href="https://elevenlabs.io" target="_blank" style="color:#c44dff">elevenlabs.io</a> でアカウント作成 → Profile → API Key をコピー
+    </p>
+  </div>
+
+  <!-- Voice Settings -->
+  <div class="card">
+    <h2>Voice Settings (声の調整)</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:16px">アニメ声に最適化された設定です。スライダーで微調整できます。</p>
+
+    <div class="setting-row">
+      <label>Stability (安定性)</label>
+      <input type="range" id="stability" min="0" max="1" step="0.05" value="0.45" oninput="updateValue(this)">
+      <span class="value">0.45</span>
+    </div>
+    <p class="setting-desc">低い = 感情豊か・アニメ的、高い = 落ち着いた声</p>
+
+    <div class="setting-row">
+      <label>Similarity (類似度)</label>
+      <input type="range" id="similarityBoost" min="0" max="1" step="0.05" value="0.90" oninput="updateValue(this)">
+      <span class="value">0.90</span>
+    </div>
+    <p class="setting-desc">高い = 元の声に忠実（クローン時に重要）</p>
+
+    <div class="setting-row">
+      <label>Style (表現力)</label>
+      <input type="range" id="style" min="0" max="1" step="0.05" value="0.65" oninput="updateValue(this)">
+      <span class="value">0.65</span>
+    </div>
+    <p class="setting-desc">高い = 感情表現が強い（アニメ声向け）</p>
+
+    <div class="setting-row">
+      <label>Speaker Boost</label>
+      <label style="width:auto"><input type="checkbox" id="speakerBoost" checked> ON</label>
+    </div>
+    <p class="setting-desc">声の明瞭さを向上</p>
+
+    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+  </div>
+
+  <!-- Voice Selection -->
+  <div class="card">
+    <h2>Voice Selection (声の選択)</h2>
+
+    <div style="margin-bottom:16px">
+      <span style="font-size:13px;color:#888">言語プレビュー：</span>
+      <div class="lang-btns" style="margin-top:8px">
+        <button class="lang-btn active" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+        <button class="lang-btn" data-lang="ko">한국어</button>
+        <button class="lang-btn" data-lang="fr">Français</button>
+        <button class="lang-btn" data-lang="es">Español</button>
+        <button class="lang-btn" data-lang="th">ภาษาไทย</button>
+      </div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="loadVoices()" id="loadVoicesBtn">Load Available Voices</button>
+    <div id="voiceGrid" class="voice-grid"></div>
+  </div>
+
+  <!-- Voice Cloning -->
+  <div class="card">
+    <h2>Voice Cloning (声のクローン)</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:16px">
+      アニメ声優の音声サンプルをアップロードして、その声で多言語対話ができます。<br>
+      推奨：クリアな音声、1〜3分、ノイズなし、BGMなし
+    </p>
+
+    <input type="text" class="clone-name" id="cloneName" placeholder="声の名前（例：Mirai Anime Voice）">
+
+    <div class="upload-area" id="uploadArea">
+      <p style="font-size:24px;margin-bottom:8px">+</p>
+      <p>音声ファイルをドラッグ&ドロップ<br>またはクリックして選択</p>
+      <p style="font-size:11px;color:#666;margin-top:8px">MP3, WAV, M4A / 最大10ファイル</p>
+      <input type="file" id="fileInput" multiple accept="audio/*" style="display:none">
+    </div>
+
+    <div id="fileList" class="file-list"></div>
+
+    <button class="btn btn-primary" onclick="cloneVoice()" id="cloneBtn" disabled>
+      Clone Voice
+    </button>
+  </div>
+
+  <!-- VRoid Studio / Unity 3D Avatar -->
+  <div class="card vroid-section">
+    <h2>3D Avatar (VRoid Studio + Unity)</h2>
+    <p style="font-size:13px;color:#ccc;margin-bottom:16px">
+      現在のPNGアバターを3Dアニメーションに進化させましょう！<br>
+      VRoid Studioでキャラクターを作り、Unity WebGLでビルドするだけです。
+    </p>
+
+    <ol class="vroid-steps">
+      <li>
+        <strong>VRoid Studioをダウンロード</strong>（無料）<br>
+        <a href="https://vroid.com/studio" target="_blank" class="vroid-link">vroid.com/studio</a>
+      </li>
+      <li>
+        <strong>メイドカフェキャラクターを作成</strong><br>
+        髪型、目、服装をカスタマイズ。メイド服のプリセットも利用可能。<br>
+        表情を設定（笑顔、驚き、考え中など）
+      </li>
+      <li>
+        <strong>VRMファイルとしてエクスポート</strong><br>
+        ファイル → VRMエクスポート → ポリゴン数を「中」に設定
+      </li>
+      <li>
+        <strong>Unity 2022.3 LTSでプロジェクトを開く</strong><br>
+        <code>unity-project/</code> フォルダにUnityプロジェクトが用意済み
+      </li>
+      <li>
+        <strong>VRMファイルをUnityにインポート</strong><br>
+        UniVRM パッケージをインストール → VRMファイルをドラッグ&ドロップ
+      </li>
+      <li>
+        <strong>WebGLビルド</strong><br>
+        File → Build Settings → WebGL → Build<br>
+        出力先: <code>public/unity/Build/</code>
+      </li>
+      <li>
+        <strong>自動切替！</strong><br>
+        ビルドファイルを配置するだけで、システムが自動的に3Dアバターに切り替わります。
+      </li>
+    </ol>
+
+    <div style="margin-top:16px;padding:14px;background:#0a0a1a;border-radius:8px">
+      <p style="font-size:13px;color:#ff6b9d;font-weight:bold;margin-bottom:6px">3Dアバターのメリット：</p>
+      <ul style="font-size:13px;color:#ccc;list-style:disc;padding-left:20px;line-height:1.8">
+        <li>リアルタイムリップシンク（音声に合わせて口が動く）</li>
+        <li>自然なまばたき・呼吸アニメーション</li>
+        <li>表情ブレンドシェイプ（喜び・驚き・考え中の滑らかな切替）</li>
+        <li>お客さんへのインパクト大幅UP</li>
+      </ul>
+    </div>
+  </div>
+
+  <a href="/" class="back-link">← メイン画面に戻る</a>
+</div>
+
+<script>
+var selectedLang = 'en';
+var uploadedFiles = [];
+var currentVoiceId = '';
+
+// Language buttons
+document.querySelectorAll('.lang-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    selectedLang = btn.dataset.lang;
+  });
+});
+
+// File upload
+var uploadArea = document.getElementById('uploadArea');
+var fileInput = document.getElementById('fileInput');
+
+uploadArea.addEventListener('click', function() { fileInput.click(); });
+uploadArea.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  uploadArea.classList.add('dragover');
+});
+uploadArea.addEventListener('dragleave', function() {
+  uploadArea.classList.remove('dragover');
+});
+uploadArea.addEventListener('drop', function(e) {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  addFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', function() {
+  addFiles(fileInput.files);
+  fileInput.value = '';
+});
+
+function addFiles(files) {
+  for (var i = 0; i < files.length && uploadedFiles.length < 10; i++) {
+    uploadedFiles.push(files[i]);
+  }
+  renderFileList();
+}
+
+function removeFile(idx) {
+  uploadedFiles.splice(idx, 1);
+  renderFileList();
+}
+
+function renderFileList() {
+  var html = '';
+  uploadedFiles.forEach(function(f, i) {
+    var size = (f.size / 1024 / 1024).toFixed(1);
+    html += '<div class="file-item"><span>' + f.name + ' (' + size + ' MB)</span><span class="remove" onclick="removeFile(' + i + ')">x</span></div>';
+  });
+  document.getElementById('fileList').innerHTML = html;
+  document.getElementById('cloneBtn').disabled = uploadedFiles.length === 0;
+}
+
+function updateValue(el) {
+  el.parentElement.querySelector('.value').textContent = el.value;
+}
+
+function showToast(msg, type) {
+  var toast = document.createElement('div');
+  toast.className = 'toast toast-' + (type || 'success');
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.remove(); }, 3000);
+}
+
+// Check API status
+async function checkApiStatus() {
+  try {
+    var res = await fetch('/api/voices');
+    var statusEl = document.getElementById('apiStatus');
+    if (res.ok) {
+      statusEl.textContent = 'Connected';
+      statusEl.className = 'status status-ok';
+      var data = await res.json();
+      currentVoiceId = data.current;
+    } else {
+      statusEl.textContent = 'Not Connected';
+      statusEl.className = 'status status-ng';
+    }
+  } catch (e) {
+    document.getElementById('apiStatus').textContent = 'Error';
+    document.getElementById('apiStatus').className = 'status status-ng';
+  }
+}
+
+// Save API key
+async function saveApiKey() {
+  var key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) return showToast('API Keyを入力してください', 'error');
+
+  try {
+    // We need a server endpoint for this
+    var res = await fetch('/api/config/apikey', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey: key })
+    });
+    if (res.ok) {
+      showToast('API Key saved! サーバーを再起動してください。');
+      document.getElementById('apiKeyInput').value = '';
+      setTimeout(checkApiStatus, 1000);
+    } else {
+      showToast('保存に失敗しました', 'error');
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// Save voice settings
+async function saveSettings() {
+  var settings = {
+    stability: parseFloat(document.getElementById('stability').value),
+    similarityBoost: parseFloat(document.getElementById('similarityBoost').value),
+    style: parseFloat(document.getElementById('style').value),
+    speakerBoost: document.getElementById('speakerBoost').checked
+  };
+
+  try {
+    var res = await fetch('/api/voices/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings)
+    });
+    if (res.ok) {
+      showToast('Settings saved!');
+    } else {
+      showToast('保存に失敗しました', 'error');
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// Load voices
+async function loadVoices() {
+  var btn = document.getElementById('loadVoicesBtn');
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+
+  try {
+    var res = await fetch('/api/voices');
+    if (!res.ok) {
+      var err = await res.json();
+      showToast(err.error, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Load Available Voices';
+      return;
+    }
+    var data = await res.json();
+    currentVoiceId = data.current;
+    renderVoices(data.voices);
+    btn.textContent = 'Refresh Voices';
+    btn.disabled = false;
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Load Available Voices';
+  }
+}
+
+function renderVoices(voices) {
+  var grid = document.getElementById('voiceGrid');
+  var html = '';
+
+  // Sort: cloned first, then premade
+  voices.sort(function(a, b) {
+    if (a.category === 'cloned' && b.category !== 'cloned') return -1;
+    if (b.category === 'cloned' && a.category !== 'cloned') return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  voices.forEach(function(v) {
+    var isActive = v.voice_id === currentVoiceId;
+    var labelsHtml = '';
+    if (v.labels) {
+      Object.entries(v.labels).forEach(function(entry) {
+        labelsHtml += '<span class="label">' + entry[0] + ': ' + entry[1] + '</span>';
+      });
+    }
+
+    html += '<div class="voice-item' + (isActive ? ' active' : '') + '" data-id="' + v.voice_id + '">';
+    html += '<div class="name">' + v.name + (isActive ? ' (current)' : '') + '</div>';
+    html += '<div class="category">' + (v.category || 'premade') + '</div>';
+    if (labelsHtml) html += '<div class="labels">' + labelsHtml + '</div>';
+    html += '<div class="actions">';
+    html += '<button class="btn btn-secondary btn-small" onclick="previewVoice(\'' + v.voice_id + '\')">Preview</button>';
+    if (!isActive) {
+      html += '<button class="btn btn-success btn-small" onclick="selectVoice(\'' + v.voice_id + '\')">Use This Voice</button>';
+    }
+    html += '</div></div>';
+  });
+
+  grid.innerHTML = html;
+}
+
+// Preview voice
+async function previewVoice(voiceId) {
+  try {
+    var res = await fetch('/api/voices/preview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ voiceId: voiceId, lang: selectedLang })
+    });
+    if (!res.ok) {
+      showToast('Preview failed', 'error');
+      return;
+    }
+    var blob = await res.blob();
+    var url = URL.createObjectURL(blob);
+    var audio = new Audio(url);
+    audio.play();
+    audio.onended = function() { URL.revokeObjectURL(url); };
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// Select voice
+async function selectVoice(voiceId) {
+  try {
+    var res = await fetch('/api/voices/select', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ voiceId: voiceId })
+    });
+    if (res.ok) {
+      currentVoiceId = voiceId;
+      showToast('Voice changed!');
+      // Refresh visual state
+      document.querySelectorAll('.voice-item').forEach(function(el) {
+        var isThis = el.dataset.id === voiceId;
+        el.classList.toggle('active', isThis);
+        el.querySelector('.name').textContent = el.querySelector('.name').textContent.replace(' (current)', '');
+        if (isThis) el.querySelector('.name').textContent += ' (current)';
+      });
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// Clone voice
+async function cloneVoice() {
+  var name = document.getElementById('cloneName').value.trim();
+  if (!name) return showToast('声の名前を入力してください', 'error');
+  if (uploadedFiles.length === 0) return showToast('音声ファイルをアップロードしてください', 'error');
+
+  var btn = document.getElementById('cloneBtn');
+  btn.disabled = true;
+  btn.textContent = 'Cloning...';
+
+  var formData = new FormData();
+  formData.append('name', name);
+  uploadedFiles.forEach(function(f) {
+    formData.append('files', f);
+  });
+
+  try {
+    var res = await fetch('/api/voices/clone', {
+      method: 'POST',
+      body: formData
+    });
+    var data = await res.json();
+    if (res.ok && data.voice_id) {
+      showToast('Voice cloned successfully! Voice ID: ' + data.voice_id);
+      uploadedFiles = [];
+      renderFileList();
+      document.getElementById('cloneName').value = '';
+      loadVoices();
+    } else {
+      showToast(data.error || 'Clone failed', 'error');
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Clone Voice';
+}
+
+// Load settings from server
+async function loadSettings() {
+  try {
+    var res = await fetch('/api/voices/settings');
+    // Settings endpoint is POST only, use defaults from page
+  } catch(e) {}
+}
+
+// Init
+checkApiStatus();
+</script>
+</body>
+</html>

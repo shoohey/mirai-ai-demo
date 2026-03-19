@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Live2D Test</title>
+  <style>
+    body { background: #1a1a2e; color: white; font-family: sans-serif; margin: 20px; }
+    #log { white-space: pre-wrap; font-size: 13px; background: #111; padding: 15px; border-radius: 8px; max-height: 300px; overflow-y: auto; }
+    #canvas-container { width: 400px; height: 500px; border: 2px solid #ff69b4; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Live2D Debug Test</h2>
+  <div id="log">Loading...</div>
+  <div id="canvas-container"></div>
+
+  <script>
+    var logEl = document.getElementById('log');
+    function log(msg) {
+      console.log(msg);
+      logEl.textContent += '\n' + msg;
+    }
+  </script>
+
+  <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"
+    onload="log('0. Cubism Core loaded OK')"
+    onerror="log('0. Cubism Core LOAD FAILED')"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js"
+    onload="log('1. pixi.js v6 loaded OK. Version: ' + PIXI.VERSION)"
+    onerror="log('1. PIXI LOAD FAILED')"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"
+    onload="log('2. pixi-live2d-display loaded. PIXI.live2d exists: ' + !!PIXI.live2d + ', Live2DModel: ' + !!(PIXI.live2d && PIXI.live2d.Live2DModel))"
+    onerror="log('2. pixi-live2d-display LOAD FAILED')"></script>
+
+  <script>
+    window.addEventListener('load', async function() {
+      log('3. Window loaded');
+
+      if (!PIXI) { log('ERROR: PIXI not defined'); return; }
+      if (!PIXI.live2d) { log('ERROR: PIXI.live2d not defined'); return; }
+
+      log('4. PIXI.live2d.Live2DModel exists: ' + !!PIXI.live2d.Live2DModel);
+
+      var container = document.getElementById('canvas-container');
+
+      try {
+        log('5. Creating PIXI.Application...');
+        var app = new PIXI.Application({
+          width: 400,
+          height: 500,
+          transparent: true,
+          antialias: true
+        });
+        container.appendChild(app.view);
+        log('6. PIXI app created OK');
+
+        log('7. Loading Live2D model...');
+        var model = await PIXI.live2d.Live2DModel.from('/live2d/models/haru/haru.model3.json');
+        log('8. Model loaded! Size: ' + model.width + 'x' + model.height);
+
+        // Scale to fit
+        var scale = Math.min(400 / model.width, 500 / model.height) * 0.8;
+        model.scale.set(scale);
+        model.x = 200;
+        model.y = 250;
+        model.anchor.set(0.5, 0.5);
+
+        app.stage.addChild(model);
+        log('9. Model added to stage - should be visible!');
+
+        // Test motion
+        try {
+          model.motion('Idle', 0);
+          log('10. Idle motion started');
+        } catch(e) {
+          log('10. Idle motion error: ' + e.message);
+        }
+
+        // Log model info
+        try {
+          var settings = model.internalModel.settings;
+          if (settings.expressions) log('Expressions: ' + settings.expressions.map(function(e){return e.Name}).join(', '));
+          if (settings.motions) log('Motions: ' + Object.keys(settings.motions).join(', '));
+        } catch(e) { log('Model info error: ' + e.message); }
+
+      } catch (err) {
+        log('ERROR: ' + err.message);
+        log('Stack: ' + err.stack);
+      }
+    });
+  </script>
+</body>
+</html>
